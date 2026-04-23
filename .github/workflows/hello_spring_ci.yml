@@ -34,13 +34,30 @@ jobs:
 
     steps:
       - name: Checkout Code
-        run: echo "Checking out code..."
+        uses: actions/checkout@v4
 
-      - name: Login to Docker Hub
-        run: echo "Logging into Docker Hub..."
+      - name: Setup JDK
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
 
-      - name: Build Docker Image
-        run: echo "Building Docker image..."
+      - name: Build JAR for Docker
+        working-directory: docker/app1-hello/springboot/hello-spring
+        run: mvn -B clean package
 
-      - name: Push Docker Image
-        run: echo "Pushing Docker image..."
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v6
+        with:
+          context: docker/app1-hello/springboot/hello-spring
+          push: true
+          tags: |
+            ${{ secrets.DOCKER_USERNAME }}/hello-spring:latest
+              ${{ secrets.DOCKER_USERNAME }}/hello-spring:${{ github.sha }}    
+                    ${{ secrets.DOCKER_USERNAME }}/hello-spring:${{ github.ref_name }}
