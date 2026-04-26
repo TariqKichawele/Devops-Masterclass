@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: app1-hello
-          image: tariqkichawele/hello-spring:latest
+          image: tariqkichawele/hello-python:latest
           env:
             - name: ENV_VALUE
               value: "Hello from app.yaml"
